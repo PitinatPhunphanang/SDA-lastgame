@@ -7,6 +7,7 @@ function Home() {
   const [showModal, setShowModal] = useState(false); // ใช้สำหรับเปิดป๊อปอัพ
   const [showStartButton, setShowStartButton] = useState(true); // สำหรับซ่อนปุ่มเริ่ม
   const navigate = useNavigate();  // ใช้ navigate สำหรับการเปลี่ยนหน้า
+  const isLoggedIn = false; // ตรวจสอบสถานะการล็อกอิน (เปลี่ยนตามสถานะการล็อกอินจริง)
 
   // ฟังก์ชันเมื่อกดเริ่มเกม
   const handleStart = () => {
@@ -26,6 +27,14 @@ function Home() {
 
   const handleExit = () => {
     window.close(); // คำสั่งในการปิดหน้าเว็บ
+  };
+
+  const handleProfileClick = () => {
+    if (!isLoggedIn) {
+      navigate('/Signin'); // ถ้ายังไม่ได้ล็อกอินให้ไปที่หน้า Signin
+    } else {
+      navigate('/Profile'); // ถ้าล็อกอินแล้วไปที่หน้าโปรไฟล์
+    }
   };
 
   return (
@@ -87,35 +96,7 @@ function Home() {
         </div>
       )}
 
-
-      <div
-        className="position-absolute"
-        style={{
-          bottom: '20px',
-          left: '20px',
-          fontSize: '2.5rem',
-          zIndex: 2,
-          color: 'white',
-          cursor: 'pointer'
-        }}
-      >
-        <i className="bi bi-gear"></i>
-      </div>
-
-      <div
-        className="position-absolute"
-        style={{
-          top: '20px',
-          left: '20px',
-          fontSize: '2.5rem',
-          zIndex: 2,
-          color: 'white',
-          cursor: 'pointer'
-        }}
-      >
-        <i className="bi bi-book"></i>
-      </div>
-
+      {/* ไอคอนโปรไฟล์ */}
       <div
         className="position-absolute"
         style={{
@@ -126,8 +107,41 @@ function Home() {
           color: 'white',
           cursor: 'pointer'
         }}
+        onClick={handleProfileClick}  // คลิกไอคอนโปรไฟล์
       >
         <i className="bi bi-person-circle"></i>
+      </div>
+
+      {/* ไอคอนคู่มือ (บนซ้าย) */}
+      <div
+        className="position-absolute"
+        style={{
+          top: '20px',
+          left: '20px',
+          fontSize: '2.5rem',
+          zIndex: 2,
+          color: 'white',
+          cursor: 'pointer'
+        }}
+        //onClick=
+      >
+        <i className="bi bi-question-circle"></i>
+      </div>
+
+      {/* ไอคอนการตั้งค่า (ล่างซ้าย) */}
+      <div
+        className="position-absolute"
+        style={{
+          bottom: '20px',
+          left: '20px',
+          fontSize: '2.5rem',
+          zIndex: 2,
+          color: 'white',
+          cursor: 'pointer'
+        }}
+        //onClick=
+      >
+        <i className="bi bi-gear"></i>
       </div>
     </div>
   );
