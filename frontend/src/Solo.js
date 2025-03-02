@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function SinglePlayerGame() {
   const navigate = useNavigate();
-  const location = useLocation();  // ใช้ location เพื่อดึง state
+  const location = useLocation();
   const [time, setTime] = useState(location.state?.time * 60 || 0);  // แปลงจากนาทีเป็นวินาที
   const [points, setPoints] = useState(0);  // คะแนน
   const [gameInterval, setGameInterval] = useState(null);  // Interval สำหรับการนับเวลา
   const [gameOver, setGameOver] = useState(false);  // สถานะเกมจบ
   const [showExitModal, setShowExitModal] = useState(false);  // สถานะการแสดง Modal
+  const [answer, setAnswer] = useState("");  // คำตอบที่พิมพ์
+  const [questionImage, setQuestionImage] = useState("");  // รูปภาพคำถามจาก Strapi
 
   // ฟังก์ชันออกจากเกม
   const handleExitGame = () => {
@@ -79,8 +82,40 @@ function SinglePlayerGame() {
     navigate('/');
   };
 
+  // ฟังก์ชันดึงภาพคำถามจาก Strapi
+  useEffect(() => {
+    const fetchQuestionImage = async () => {
+      try {
+        const response = await axios.get('http://localhost:1337/api/questions?populate=image');
+        const questionData = response.data.data[0];  // Get the first question
+        if (questionData && questionData.image) {
+          setQuestionImage(`http://localhost:1337${questionData.image.url}`);
+        }
+      } catch (error) {
+        console.error("Error fetching question image:", error);
+      }
+    };
+
+    fetchQuestionImage();
+  }, []);
+
+  // ฟังก์ชันการพิมพ์คำตอบ
+  const handleAnswerChange = (e) => {
+    setAnswer(e.target.value);
+  };
+
+  // ฟังก์ชันการยืนยันคำตอบ
+  const handleSubmitAnswer = () => {
+    if (answer.trim() === "correct answer") {  // ตรวจสอบคำตอบ
+      alert("คำตอบถูกต้อง!");
+      setPoints(points + 10);  // เพิ่มคะแนน
+    } else {
+      alert("คำตอบไม่ถูกต้อง");
+    }
+  };
+
   return (
-    <div 
+    <div
       className="d-flex justify-content-center align-items-center min-vh-100"
       style={{
         backgroundImage: 'url(/777.gif)',
@@ -103,8 +138,8 @@ function SinglePlayerGame() {
       </div>
 
       {/* ไอคอนออกเกม */}
-      <div 
-        className="position-absolute" 
+      <div
+        className="position-absolute"
         style={{ bottom: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
         onClick={handleShowExitModal}
       >
@@ -112,12 +147,34 @@ function SinglePlayerGame() {
       </div>
 
       {/* ไอคอนคำใบ้ */}
-      <div 
-        className="position-absolute" 
+      <div
+        className="position-absolute"
         style={{ bottom: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
         onClick={handleHint}
       >
         <i className="bi bi-lightbulb"></i> {/* ไอคอนคำใบ้ */}
+      </div>
+
+      {/* รูปภาพคำถาม */}
+      <div className="position-absolute" style={{ top: '40%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
+        {questionImage ? (
+          <img src={questionImage} alt="Question" style={{ width: '200px', height: 'auto', borderRadius: '10px' }} />
+        ) : (
+          <div>กำลังโหลดภาพ...</div>
+        )}
+      </div>
+
+      {/* ช่องกรอกคำตอบ */}
+      <div className="position-absolute" style={{ bottom: '100px', left: '50%', transform: 'translateX(-50%)' }}>
+        <input
+          type="text"
+          value={answer}
+          onChange={handleAnswerChange}
+          className="form-control"
+          placeholder="พิมพ์คำตอบของคุณ..."
+          style={{ width: '300px', fontSize: '1.2rem' }}
+        />
+        <button className="btn btn-success mt-2" onClick={handleSubmitAnswer}>ส่งคำตอบ</button>
       </div>
 
       {/* เกมกลาง */}
