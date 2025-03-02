@@ -13,10 +13,18 @@ function SinglePlayerGame() {
   const [showExitModal, setShowExitModal] = useState(false);  // สถานะการแสดง Modal
   const [answer, setAnswer] = useState("");  // คำตอบที่พิมพ์
   const [questionImage, setQuestionImage] = useState("");  // รูปภาพคำถามจาก Strapi
+  const [selectedTime, setSelectedTime] = useState(60); // เวลาเริ่มต้น
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false); // สถานะแสดง dropdown เลือกเวลา
+  const [totalTimeUsed, setTotalTimeUsed] = useState(0); // เวลาทั้งหมดที่ใช้ไป
+  const [showTimeSelection, setShowTimeSelection] = useState(false); // สถานะแสดง dropdown เมื่อกดเล่นอีกครั้ง
 
   // ฟังก์ชันออกจากเกม
   const handleExitGame = () => {
     navigate('/');  // เมื่อกดออกจากเกม จะกลับไปหน้า Home
+  };
+
+  const handlePlayagain = () => {
+    setShowTimeSelection(true); // แสดง dropdown เลือกเวลา
   };
 
   // ฟังก์ชันแสดงคำใบ้
@@ -39,7 +47,8 @@ function SinglePlayerGame() {
           }
           return prevTime - 1;
         });
-      }, 1000);  // นับเวลา 1 วินาที
+        setTotalTimeUsed(prevTotalTimeUsed => prevTotalTimeUsed + 1); // นับเวลาทั้งหมดที่ใช้ไป
+      }, 1000);
 
       setGameInterval(interval);
 
@@ -57,8 +66,14 @@ function SinglePlayerGame() {
 
   // ฟังก์ชันเปิด/ปิด modal เมื่อคลิกที่ไอคอนออก
   const handleShowExitModal = () => {
-    clearInterval(gameInterval); // หยุดเวลา
-    setShowExitModal(true);  // แสดง modal
+    if (gameOver) {
+      // ถ้าเกมจบแล้ว ให้ออกจากเกมทันทีโดยไม่แสดง modal
+      handleExitGame();
+    } else {
+      // ถ้าเกมยังไม่จบ ให้แสดง modal ยืนยัน
+      clearInterval(gameInterval);
+      setShowExitModal(true);
+    }
   };
 
   const handleContinueGame = () => {
@@ -80,6 +95,15 @@ function SinglePlayerGame() {
   const handleConfirmExit = () => {
     setShowExitModal(false);  // ซ่อน modal และออกจากเกม
     navigate('/');
+  };
+
+  const handleTimeChange = (newTime) => {
+    setSelectedTime(newTime);
+    setTime(newTime); // ตั้งค่าเวลาใหม่
+    setShowTimeSelection(false); // ปิด dropdown หลังจากเลือกเวลา
+    setGameOver(false); // รีเซ็ตสถานะเกม
+    setPoints(0); // รีเซ็ตคะแนน
+    setTotalTimeUsed(0); // รีเซ็ตเวลาทั้งหมดที่ใช้ไป
   };
 
   // ฟังก์ชันดึงภาพคำถามจาก Strapi
@@ -112,6 +136,12 @@ function SinglePlayerGame() {
     } else {
       alert("คำตอบไม่ถูกต้อง");
     }
+  };
+
+  // แปลงเวลาเป็นข้อความ (1 นาที, 5 นาที, 10 นาที)
+  const getTimeLabel = (seconds) => {
+    const minutes = seconds / 60;
+    return `${minutes} นาที`;
   };
 
   return (
@@ -177,18 +207,91 @@ function SinglePlayerGame() {
         <button className="btn btn-success mt-2" onClick={handleSubmitAnswer}>ส่งคำตอบ</button>
       </div>
 
-      {/* เกมกลาง */}
-      <div className="d-flex justify-content-center align-items-center" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '2rem', color: 'white' }}>
-        <div>
-          {gameOver ? (
-            <div>
-              <h3>หมดเวลา!</h3>
-              <div>คะแนน: {points}</div>
-              <button className="btn btn-danger mt-3" onClick={handleExitGame}>ออกจากเกม</button>
-            </div>
-          ) : null}
+      {/* ส่วนของหมดเวลา */}
+      {gameOver ? (
+        <div 
+          className="d-flex flex-column align-items-center" 
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+            padding: '60px 120px', 
+            borderRadius: '15px', 
+            color: 'black', 
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
+            textAlign: 'center',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 1000
+          }}
+        >
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '20px' }}>หมดเวลา</div>
+          <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>เวลาที่ใช้ไป: {formatTime(totalTimeUsed)}</div> {/* เวลาทั้งหมดที่ใช้ไป */}
+          <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>คะแนน: {points}</div>
+          <div style={{ fontSize: '1.5rem', marginBottom: '20px' }}>คะแนนสูงสุด: </div>
+
+          {/* ปุ่มเล่นอีกครั้งและ dropdown */}
+          <div className="d-flex mb-3" style={{ gap: '10px', width: '100%', position: 'relative' }}>
+            <button 
+              className="btn btn-success mt-3" 
+              style={{ fontSize: '1.2rem', padding: '10px 20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', width: '100%' }}
+              onClick={handlePlayagain}
+            >
+              เล่นอีกครั้ง
+            </button>
+
+            {showTimeSelection && (
+              <div 
+                className="dropdown-menu show" 
+                style={{ 
+                  position: 'absolute', 
+                  top: '100%', 
+                  right: '0', 
+                  minWidth: '120px', 
+                  backgroundColor: 'white', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '10px', 
+                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                  zIndex: 1000,
+                  padding: '10px',
+                  marginTop: '10px' // เพิ่มระยะห่างจากปุ่ม
+                }}
+              >
+                <button 
+                  className="dropdown-item" 
+                  style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }}
+                  onClick={() => handleTimeChange(60)}
+                >
+                  1 นาที
+                </button>
+                <button 
+                  className="dropdown-item" 
+                  style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }}
+                  onClick={() => handleTimeChange(300)}
+                >
+                  5 นาที
+                </button>
+                <button 
+                  className="dropdown-item" 
+                  style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }}
+                  onClick={() => handleTimeChange(600)}
+                >
+                  10 นาที
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* ปุ่มกลับสู่หน้าหลัก */}
+          <button 
+            className="btn btn-danger mt-3" 
+            style={{ fontSize: '1.2rem', padding: '10px 20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', width: '100%' }}
+            onClick={handleExitGame}
+          >
+            กลับหน้าหลัก
+          </button>
         </div>
-      </div>
+      ) : null}
 
       {/* Modal ถามยืนยันการออกจากเกม */}
       {showExitModal && (

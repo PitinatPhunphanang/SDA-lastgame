@@ -20,6 +20,7 @@ function ModeSelection() {
   };
   const handleSoloGame = () => navigate('/solo', { state: { time: time } });
   const handleGoLeaderboard = () => navigate('/Leaderboard');
+  const handleProfileClick = () => navigate('/Signin'); //คลิกไอคอนโปรไฟล์
 
   return (
     <div 
@@ -105,6 +106,15 @@ function ModeSelection() {
         onClick={handleGoLeaderboard}
       >
         <i className="bi bi-trophy"></i>
+      </div>
+
+      {/* ไอคอนโปรไฟล์ */}
+      <div 
+        className="position-absolute" 
+        style={{ top: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
+        onClick={handleProfileClick}
+      >
+        <i className="bi bi-person-circle"></i>
       </div>
 
       {/* Modal สำหรับเลือกเวลา */}

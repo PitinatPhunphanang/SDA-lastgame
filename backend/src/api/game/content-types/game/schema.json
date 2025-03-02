@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "games",
+  "info": {
+    "singularName": "game",
+    "pluralName": "games",
+    "displayName": "Game"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "img": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "answer": {
+      "type": "string"
+    },
+    "hint": {
+      "type": "string"
+    }
+  }
+}

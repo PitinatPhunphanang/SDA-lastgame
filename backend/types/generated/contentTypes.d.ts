@@ -369,6 +369,33 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiGameGame extends Struct.CollectionTypeSchema {
+  collectionName: 'games';
+  info: {
+    displayName: 'Game';
+    pluralName: 'games';
+    singularName: 'game';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    answer: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    hint: Schema.Attribute.String;
+    img: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::game.game'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
   collectionName: 'players';
   info: {
@@ -947,6 +974,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::game.game': ApiGameGame;
       'api::player.player': ApiPlayerPlayer;
       'api::username.username': ApiUsernameUsername;
       'plugin::content-releases.release': PluginContentReleasesRelease;
