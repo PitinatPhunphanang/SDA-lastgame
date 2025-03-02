@@ -96,6 +96,14 @@ function Signin() {
             </button>
           </p>
         </div>
+        <div className="mt-3">
+          <p className="text-light">
+            หรือ{' '}
+            <button onClick={() => navigate('/mode')} className="text-blue-500 hover:underline">
+              เข้าเล่นโดยไม่เข้าสู่ระบบ
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
