@@ -186,9 +186,7 @@ function SinglePlayerGame() {
               <div>คะแนน: {points}</div>
               <button className="btn btn-danger mt-3" onClick={handleExitGame}>ออกจากเกม</button>
             </div>
-          ) : (
-            <div>เกมคนเดียว</div>
-          )}
+          ) : null}
         </div>
       </div>
 
