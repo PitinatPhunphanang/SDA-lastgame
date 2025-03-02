@@ -8,7 +8,7 @@ import Matching from './Matching';
 import SignUp from './signup';
 import Signin from './signin';
 import Leaderboard from './Leaderboard';
-
+import TwoPlayerGame from './TwoPlayerGame';
 
 function App() {
   return (
@@ -22,6 +22,8 @@ function App() {
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/Leaderboard" element={<Leaderboard />} />
+          <Route path="/TwoPlayerGame" element={<TwoPlayerGame />} />
+
       
 
 
