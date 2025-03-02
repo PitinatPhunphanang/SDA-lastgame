@@ -70,7 +70,7 @@ function Leaderboard() {
                 <th className="text-center">ลำดับที่</th>
                 <th className="text-center">ชื่อ</th>
                 <th className="text-center">คะแนน</th>
-                <th className="text-center">ภาพ</th>
+                
               </tr>
             </thead>
             <tbody>
@@ -82,17 +82,6 @@ function Leaderboard() {
                   <td className="text-center">{player.rank}</td>
                   <td className="text-center">{player.name}</td>
                   <td className="text-center">{player.score}</td>
-                  <td className="text-center">
-                    {player.avatar ? (
-                      <img
-                        src={`http://localhost:1337${player.avatar.url}`} // เปลี่ยน URL ให้เป็น URL ของภาพ
-                        alt={player.name}
-                        style={{ width: '50px', height: '50px', borderRadius: '50%' }}
-                      />
-                    ) : (
-                      'ไม่มีภาพ'
-                    )}
-                  </td>
                 </tr>
               ))}
             </tbody>
