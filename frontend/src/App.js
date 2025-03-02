@@ -9,24 +9,29 @@ import SignUp from './signup';
 import Signin from './signin';
 import Leaderboard from './Leaderboard';
 import TwoPlayerGame from './TwoPlayerGame';
+import ProtectedRoute from "./ProtectedRoute"; // Import Protected Route
+import Profile from './profile';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
+          {/* หน้าที่ยอมให้ทุกคนเข้าถึงได้ */}
           <Route path="/" element={<Home />} />
           <Route path="/mode" element={<ModeSelection />} />
           <Route path="/solo" element={<SoloMode />} />
-          <Route path="/matching" element={<Matching />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/signin" element={<Signin />} />
+          <Route path="/matching" element={<Matching />} />
           <Route path="/Leaderboard" element={<Leaderboard />} />
           <Route path="/TwoPlayerGame" element={<TwoPlayerGame />} />
 
-      
 
-
+          {/* Protected Routes (เฉพาะผู้ที่ล็อกอินเท่านั้น) */}
+          <Route element={<ProtectedRoute />}>
+          <Route path="/profile" element={<Profile />} />
+          </Route>
         </Routes>
       </div>
     </Router>

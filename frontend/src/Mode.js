@@ -20,7 +20,7 @@ function ModeSelection() {
   };
   const handleSoloGame = () => navigate('/solo', { state: { time: time } });
   const handleGoLeaderboard = () => navigate('/Leaderboard');
-  const handleProfileClick = () => navigate('/Signin'); //คลิกไอคอนโปรไฟล์
+  const handleProfileClick = () => navigate('/Profile'); //คลิกไอคอนโปรไฟล์
 
   return (
     <div 

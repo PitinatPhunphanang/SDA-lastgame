@@ -20,7 +20,7 @@ function Signin() {
       });
 
       const token = response.data.jwt;
-      localStorage.setItem('authToken', token);
+      sessionStorage.setItem('authToken', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       console.log('Login successful');

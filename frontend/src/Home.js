@@ -7,8 +7,6 @@ function Home() {
   const [showModal, setShowModal] = useState(false); // ใช้สำหรับเปิดป๊อปอัพ
   const [showStartButton, setShowStartButton] = useState(true); // สำหรับซ่อนปุ่มเริ่ม
   const navigate = useNavigate();  // ใช้ navigate สำหรับการเปลี่ยนหน้า
-  const isLoggedIn = false; // ตรวจสอบสถานะการล็อกอิน (เปลี่ยนตามสถานะการล็อกอินจริง)
-
   // ฟังก์ชันเมื่อกดเริ่มเกม
   const handleStart = () => {
     setShowModal(true); // เปิดป๊อปอัพ
@@ -30,11 +28,7 @@ function Home() {
   };
 
   const handleProfileClick = () => {
-    if (!isLoggedIn) {
-      navigate('/Signin'); // ถ้ายังไม่ได้ล็อกอินให้ไปที่หน้า Signin
-    } else {
       navigate('/Profile'); // ถ้าล็อกอินแล้วไปที่หน้าโปรไฟล์
-    }
   };
 
   return (
