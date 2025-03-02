@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "usernames",
+  "info": {
+    "singularName": "username",
+    "pluralName": "usernames",
+    "displayName": "Username",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}
