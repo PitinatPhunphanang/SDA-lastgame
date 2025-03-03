@@ -14,11 +14,17 @@ function Home() {
   };
 
   const handleLogin = () => {
+    const token = sessionStorage.getItem("authToken"); // ดึง JWT จาก sessionStorage
+  if (token) {
+    navigate("/Mode"); // ถ้า login แล้ว ไปที่หน้า Mode เลย
+  } else {
     setShowModal(false); // ปิดป๊อปอัพ
     navigate('/Signin'); // ไปที่หน้า Login
+  }
   };
 
   const handleNoLogin = () => {
+    sessionStorage.removeItem("authToken"); // ลบ JWT ออกจาก sessionStorage
     setShowModal(false); // ปิดป๊อปอัพ
     navigate('/Mode'); // ไปที่หน้าเกมโดยไม่ล็อกอิน
   };
