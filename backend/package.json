@@ -8,17 +8,21 @@
     "deploy": "strapi deploy",
     "develop": "strapi develop",
     "start": "strapi start",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "websocket": "node src/websocket.js",
+    "dev": "concurrently \"npm run develop\" \"npm run websocket\""
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.10.4",
     "@strapi/plugin-users-permissions": "5.10.4",
     "@strapi/strapi": "5.10.4",
     "better-sqlite3": "11.3.0",
+    "concurrently": "^9.1.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0"
+    "styled-components": "^6.0.0",
+    "ws": "^8.18.1"
   },
   "devDependencies": {
     "@types/node": "^20",
