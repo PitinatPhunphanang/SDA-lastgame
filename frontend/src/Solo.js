@@ -17,6 +17,8 @@ function SinglePlayerGame() {
   const [showTimeDropdown, setShowTimeDropdown] = useState(false); // สถานะแสดง dropdown เลือกเวลา
   const [totalTimeUsed, setTotalTimeUsed] = useState(0); // เวลาทั้งหมดที่ใช้ไป
   const [showTimeSelection, setShowTimeSelection] = useState(false); // สถานะแสดง dropdown เมื่อกดเล่นอีกครั้ง
+  const [correctAnswer, setCorrectAnswer] = useState(""); // คำตอบที่ถูกต้องจาก Strapi
+  const [hint, setHint] = useState("");  // คำใบ้จาก Strapi
 
   // ฟังก์ชันออกจากเกม
   const handleExitGame = () => {
@@ -29,7 +31,7 @@ function SinglePlayerGame() {
 
   // ฟังก์ชันแสดงคำใบ้
   const handleHint = () => {
-    alert('คำใบ้: คิดดีๆครับพี่');
+    alert(`คำใบ้: ${hint}`); // แสดงคำใบ้จาก state
   };
 
   // เริ่มต้นนับเวลา
@@ -110,10 +112,19 @@ function SinglePlayerGame() {
   useEffect(() => {
     const fetchQuestionImage = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/questions?populate=image');
+        const response = await axios.get('http://localhost:1337/api/games?populate=*');
         const questionData = response.data.data[0];  // Get the first question
-        if (questionData && questionData.image) {
-          setQuestionImage(`http://localhost:1337${questionData.image.url}`);
+        if (questionData && questionData.img) {
+          const imageUrl = `http://localhost:1337${questionData.img.url}`;
+          const gameData = response.data.data[0];  // Get the first question
+          if (gameData) {
+            setQuestionImage(imageUrl);
+            setCorrectAnswer(gameData.awws); // Set the correct answer
+            setHint(gameData.hint); // Set the hint
+            console.log('Correct Answer:', gameData.awws); // ตรวจสอบคำตอบที่ดึงมา
+            console.log('Hint:', gameData.hint); // ตรวจสอบคำใบ้ที่ดึงมา
+          }
+
         }
       } catch (error) {
         console.error("Error fetching question image:", error);
@@ -130,18 +141,16 @@ function SinglePlayerGame() {
 
   // ฟังก์ชันการยืนยันคำตอบ
   const handleSubmitAnswer = () => {
-    if (answer.trim() === "correct answer") {  // ตรวจสอบคำตอบ
+    console.log('User Answer:', answer.trim()); // ตรวจสอบคำตอบที่ผู้เล่นป้อน
+    console.log('Correct Answer:', correctAnswer); // ตรวจสอบคำตอบที่ถูกต้องจาก Strapi
+
+    if (answer.trim() === correctAnswer) {  // ตรวจสอบคำตอบ
       alert("คำตอบถูกต้อง!");
       setPoints(points + 10);  // เพิ่มคะแนน
+      // เพิ่มโค้ดสำหรับคำถามถัดไปที่นี่
     } else {
       alert("คำตอบไม่ถูกต้อง");
     }
-  };
-
-  // แปลงเวลาเป็นข้อความ (1 นาที, 5 นาที, 10 นาที)
-  const getTimeLabel = (seconds) => {
-    const minutes = seconds / 60;
-    return `${minutes} นาที`;
   };
 
   return (
@@ -186,9 +195,9 @@ function SinglePlayerGame() {
       </div>
 
       {/* รูปภาพคำถาม */}
-      <div className="position-absolute" style={{ top: '40%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
+      <div className="position-absolute" style={{ top: '10%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
         {questionImage ? (
-          <img src={questionImage} alt="Question" style={{ width: '200px', height: 'auto', borderRadius: '10px' }} />
+          <img src={questionImage} alt="Question" style={{ width: '600px', height: 'auto', borderRadius: '10px' }} />
         ) : (
           <div>กำลังโหลดภาพ...</div>
         )}
@@ -209,13 +218,13 @@ function SinglePlayerGame() {
 
       {/* ส่วนของหมดเวลา */}
       {gameOver ? (
-        <div 
-          className="d-flex flex-column align-items-center" 
+        <div
+          className="d-flex flex-column align-items-center"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)', 
-            padding: '60px 120px', 
-            borderRadius: '15px', 
-            color: 'black', 
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            padding: '60px 120px',
+            borderRadius: '15px',
+            color: 'black',
             boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
             textAlign: 'center',
             position: 'absolute',
@@ -226,14 +235,14 @@ function SinglePlayerGame() {
           }}
         >
           <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '20px' }}>หมดเวลา</div>
-          <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>เวลาที่ใช้ไป: {formatTime(totalTimeUsed)}</div> {/* เวลาทั้งหมดที่ใช้ไป */}
+          <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>เวลาที่ใช้ไป: {formatTime(totalTimeUsed)}</div>
           <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>คะแนน: {points}</div>
           <div style={{ fontSize: '1.5rem', marginBottom: '20px' }}>คะแนนสูงสุด: </div>
 
           {/* ปุ่มเล่นอีกครั้งและ dropdown */}
           <div className="d-flex mb-3" style={{ gap: '10px', width: '100%', position: 'relative' }}>
-            <button 
-              className="btn btn-success mt-3" 
+            <button
+              className="btn btn-success mt-3"
               style={{ fontSize: '1.2rem', padding: '10px 20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', width: '100%' }}
               onClick={handlePlayagain}
             >
@@ -241,38 +250,38 @@ function SinglePlayerGame() {
             </button>
 
             {showTimeSelection && (
-              <div 
-                className="dropdown-menu show" 
-                style={{ 
-                  position: 'absolute', 
-                  top: '100%', 
-                  right: '0', 
-                  minWidth: '120px', 
-                  backgroundColor: 'white', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '10px', 
+              <div
+                className="dropdown-menu show"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: '0',
+                  minWidth: '120px',
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '10px',
                   boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
                   zIndex: 1000,
                   padding: '10px',
                   marginTop: '10px' // เพิ่มระยะห่างจากปุ่ม
                 }}
               >
-                <button 
-                  className="dropdown-item" 
+                <button
+                  className="dropdown-item"
                   style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }}
                   onClick={() => handleTimeChange(60)}
                 >
                   1 นาที
                 </button>
-                <button 
-                  className="dropdown-item" 
+                <button
+                  className="dropdown-item"
                   style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }}
                   onClick={() => handleTimeChange(300)}
                 >
                   5 นาที
                 </button>
-                <button 
-                  className="dropdown-item" 
+                <button
+                  className="dropdown-item"
                   style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }}
                   onClick={() => handleTimeChange(600)}
                 >
@@ -283,8 +292,8 @@ function SinglePlayerGame() {
           </div>
 
           {/* ปุ่มกลับสู่หน้าหลัก */}
-          <button 
-            className="btn btn-danger mt-3" 
+          <button
+            className="btn btn-danger mt-3"
             style={{ fontSize: '1.2rem', padding: '10px 20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', width: '100%' }}
             onClick={handleExitGame}
           >
