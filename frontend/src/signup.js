@@ -26,6 +26,15 @@ function SignUp() {
 
       console.log('User created:', response.data);
 
+      const pulltoken = await axios.post('http://localhost:1337/api/auth/local', {
+        identifier: email,
+        password: password,
+      });
+      const token = pulltoken.data.jwt;
+      sessionStorage.setItem('authToken', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      console.log('Login successful');
       // ถ้าสมัครสำเร็จ เปลี่ยนหน้าไปที่หน้าเกม
       navigate('/mode');
     } catch (error) {
