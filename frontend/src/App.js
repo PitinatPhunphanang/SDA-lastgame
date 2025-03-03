@@ -11,6 +11,7 @@ import Leaderboard from './Leaderboard';
 import TwoPlayerGame from './TwoPlayerGame';
 import ProtectedRoute from "./ProtectedRoute"; // Import Protected Route
 import Profile from './profile';
+import GlobalChat from './Globalchat';
 
 function App() {
   return (
@@ -27,9 +28,9 @@ function App() {
           <Route path="/Leaderboard" element={<Leaderboard />} />
           <Route path="/TwoPlayerGame" element={<TwoPlayerGame />} />
 
-
           {/* Protected Routes (เฉพาะผู้ที่ล็อกอินเท่านั้น) */}
           <Route element={<ProtectedRoute />}>
+          <Route path="/globalchat" element={<GlobalChat />} />
           <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>
