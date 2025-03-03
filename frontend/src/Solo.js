@@ -20,13 +20,34 @@ function SinglePlayerGame() {
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [hint, setHint] = useState("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [totalQuestions, settotalQuestions] = useState(1);
+  const [totalQuestions, setTotalQuestions] = useState(1);
+  const [userName, setUserName] = useState(""); // สร้าง state สำหรับเก็บ username
 
-  // ตรวจสอบ token เมื่อ component ถูก mount
+  // ฟังก์ชันดึงข้อมูลผู้ใช้จาก token
+  const getUserDetails = async () => {
+    const token = sessionStorage.getItem("authToken"); // ดึง token จาก sessionStorage
+    if (token) {
+      try {
+        const response = await axios.get("http://localhost:1337/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`, // ใส่ Token ใน header
+          },
+        });
+        console.log("User Details:", response.data);
+        setUserName(response.data.username); // เก็บ username ใน state
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    } else {
+      console.log("No token found, user is not authenticated.");
+    }
+  };
+
+  // เรียกใช้ฟังก์ชันดึงข้อมูลผู้ใช้เมื่อ component mount
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
-    console.log('Token from sessionStorage:', token); 
-  }, []); // ตัวว่างหมายถึงรันครั้งเดียวเมื่อ mount
+    getUserDetails(); // ดึงข้อมูลผู้ใช้เมื่อ component ถูก mount
+  }, []);
+
   const submitScore = async (finalPoints) => {
     const token = sessionStorage.getItem("authToken");
     if (!token) {
@@ -35,15 +56,26 @@ function SinglePlayerGame() {
     }
 
     try {
-      const response = await axios.post("http://localhost:1337/api/players", {
-        data: {
-          score: finalPoints// ส่งคะแนนไปที่ฟิลด์ score
-        },
+      // เรียกข้อมูลผู้ใช้ที่ล็อกอิน
+      const response = await axios.get("http://localhost:1337/api/users/me", {
         headers: {
-          Authorization: `Bearer ${token}`, // ส่ง token ไปใน headers
+          Authorization: `Bearer ${token}`, // ส่ง token ใน headers
         },
       });
-      console.log('Score posted:', response.data);
+
+      // ส่งข้อมูลคะแนนพร้อมกับ userId ไปยัง API
+      const userId = response.data.id; // ดึง userId จาก response
+      const scoreResponse = await axios.post("http://localhost:1337/api/players", {
+        data: {
+          score: finalPoints,
+          user: userId,  // ส่ง userId ไปในข้อมูล
+        },
+        headers: {
+          Authorization: `Bearer ${token}`, // ส่ง token ใน headers
+        },
+      });
+
+      console.log('Score posted:', scoreResponse.data);
     } catch (error) {
       console.error('Error posting score:', error);
     }
@@ -137,7 +169,7 @@ function SinglePlayerGame() {
       const questionData = response.data.data[index];
       if (questionData && questionData.img) {
         const imageUrl = `http://localhost:1337${questionData.img.url}`;
-        settotalQuestions(response.data.data.length);
+        setTotalQuestions(response.data.data.length);
         console.log("total", totalQuestions);
         console.log("current", currentQuestionIndex);
         setQuestionImage(imageUrl);
@@ -176,6 +208,7 @@ function SinglePlayerGame() {
       alert("คำตอบไม่ถูกต้อง");
     }
   };
+
   useEffect(() => {
     if (gameOver) {
       const token = sessionStorage.getItem("authToken"); // ตรวจสอบ token
