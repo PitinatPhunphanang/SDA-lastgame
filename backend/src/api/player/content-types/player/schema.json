@@ -11,24 +11,10 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "name": {
-      "type": "string"
-    },
     "score": {
       "type": "integer"
     },
-    "avatar": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
-    "users_permissions_user": {
+    "user": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user",

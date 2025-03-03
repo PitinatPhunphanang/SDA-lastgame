@@ -17,18 +17,19 @@
     "email": {
       "type": "email"
     },
-    "users_permissions_user": {
+    "player": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "target": "api::player.player"
     },
     "profile": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
     }
   }
 }
