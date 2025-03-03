@@ -38,7 +38,7 @@ function Leaderboard() {
     const fetchPlayers = async () => {
       try {
         // เปลี่ยน URL ให้ตรงกับ API ของ Strapi ของคุณ
-        const response = await axios.get('http://localhost:1337/api/players?populate=avatar'); // ดึงข้อมูลผู้เล่นและภาพ
+        const response = await axios.get('http://localhost:1337/api/players'); // ดึงข้อมูลผู้เล่นและภาพ
         console.log(response)
         const sortedPlayers = response.data.data
           .map(player => ({
