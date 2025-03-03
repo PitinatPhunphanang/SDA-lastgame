@@ -19,6 +19,8 @@ function SinglePlayerGame() {
   const [showTimeSelection, setShowTimeSelection] = useState(false); // สถานะแสดง dropdown เมื่อกดเล่นอีกครั้ง
   const [correctAnswer, setCorrectAnswer] = useState(""); // คำตอบที่ถูกต้องจาก Strapi
   const [hint, setHint] = useState("");  // คำใบ้จาก Strapi
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // คำถามที่เท่าไหร่
+  const [totalQuestions, settotalQuestions] = useState(1); // คำถามทั้งหมดที่มี
 
   // ฟังก์ชันออกจากเกม
   const handleExitGame = () => {
@@ -106,33 +108,41 @@ function SinglePlayerGame() {
     setGameOver(false); // รีเซ็ตสถานะเกม
     setPoints(0); // รีเซ็ตคะแนน
     setTotalTimeUsed(0); // รีเซ็ตเวลาทั้งหมดที่ใช้ไป
+    setCurrentQuestionIndex(0); // เริ่มที่ข้อแรกใหม่
   };
 
-  // ฟังก์ชันดึงภาพคำถามจาก Strapi
-  useEffect(() => {
-    const fetchQuestionImage = async () => {
-      try {
-        const response = await axios.get('http://localhost:1337/api/games?populate=*');
-        const questionData = response.data.data[0];  // Get the first question
-        if (questionData && questionData.img) {
-          const imageUrl = `http://localhost:1337${questionData.img.url}`;
-          const gameData = response.data.data[0];  // Get the first question
-          if (gameData) {
-            setQuestionImage(imageUrl);
-            setCorrectAnswer(gameData.awws); // Set the correct answer
-            setHint(gameData.hint); // Set the hint
-            console.log('Correct Answer:', gameData.awws); // ตรวจสอบคำตอบที่ดึงมา
-            console.log('Hint:', gameData.hint); // ตรวจสอบคำใบ้ที่ดึงมา
-          }
+  // ฟังก์ชันดึงข้อมูลคำถาม
+  const fetchQuestionImage = async (index) => {
+    try {
+      const response = await axios.get("http://localhost:1337/api/games?populate=*");
+      const questionData = response.data.data[index]; // ดึงคำถามตาม index
+      if (questionData && questionData.img) {
+        const imageUrl = `http://localhost:1337${questionData.img.url}`;
+        settotalQuestions(response.data.data.length);
+        console.log("total",totalQuestions)
+        console.log("current",currentQuestionIndex)
 
-        }
-      } catch (error) {
-        console.error("Error fetching question image:", error);
+        setQuestionImage(imageUrl);
+        setCorrectAnswer(questionData.awws); // Set the correct answer
+        setHint(questionData.hint); // Set the hint
+        console.log("Correct Answer:", questionData.awws); // ตรวจสอบคำตอบที่ดึงมา
+        console.log("Hint:", questionData.hint); // ตรวจสอบคำใบ้ที่ดึงมา
       }
-    };
+    } catch (error) {
+      console.error("Error fetching question image:", error);
+    }
+  };
 
-    fetchQuestionImage();
-  }, []);
+  // ดึงคำถามแรกเมื่อโหลดหน้า
+  useEffect(() => {
+    if (currentQuestionIndex >= totalQuestions) {
+      clearInterval(gameInterval);
+      setGameOver(true);
+    } else {
+      fetchQuestionImage(currentQuestionIndex);
+    }
+  }, [currentQuestionIndex]);
+
 
   // ฟังก์ชันการพิมพ์คำตอบ
   const handleAnswerChange = (e) => {
@@ -147,7 +157,9 @@ function SinglePlayerGame() {
     if (answer.trim() === correctAnswer) {  // ตรวจสอบคำตอบ
       alert("คำตอบถูกต้อง!");
       setPoints(points + 10);  // เพิ่มคะแนน
-      // เพิ่มโค้ดสำหรับคำถามถัดไปที่นี่
+      // ดึงคำถามถัดไป
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1); // อัปเดต index คำถาม
+      setAnswer(""); // เคลียร์ช่องตอบคำถาม
     } else {
       alert("คำตอบไม่ถูกต้อง");
     }
