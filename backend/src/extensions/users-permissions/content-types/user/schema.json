@@ -72,7 +72,7 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::player.player",
-      "inversedBy": "users_permissions_user"
+      "mappedBy": "user"
     }
   }
 }
