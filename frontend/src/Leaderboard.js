@@ -6,6 +6,33 @@ function Leaderboard() {
   const [players, setPlayers] = useState([]); // State สำหรับเก็บข้อมูลผู้เล่น
   const [loading, setLoading] = useState(true); // ใช้สำหรับแสดงสถานะการโหลด
 
+  // เชื่อมต่อ WebSocket (multiuser ทำ leaderboard แบบ realtime)
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8080');
+  
+    ws.onopen = () => {
+      console.log('Connected to WebSocket');
+    };
+  
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Received data:', data); // ตรวจสอบว่าข้อมูลถูกรับ
+      if (data.type === 'playerCreated' || data.type === 'playerUpdated') {
+        // อัปเดต Leaderboard เมื่อมีผู้เล่นใหม่หรืออัปเดต
+        setPlayers((prevPlayers) => {
+          const updatedPlayers = prevPlayers.filter((player) => player.id !== data.player.id);
+          updatedPlayers.push(data.player);
+          return updatedPlayers.sort((a, b) => b.score - a.score);
+        });
+      }
+    };
+
+    return () => {
+      ws.close();
+      console.log('Disconnected to WebSocket');
+    };
+  }, []);
+
   // ดึงข้อมูลผู้เล่นจาก Strapi
   useEffect(() => {
     const fetchPlayers = async () => {
