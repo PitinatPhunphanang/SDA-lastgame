@@ -21,6 +21,7 @@ function ModeSelection() {
   const handleSoloGame = () => navigate('/solo', { state: { time: time } });
   const handleGoLeaderboard = () => navigate('/Leaderboard');
   const handleProfileClick = () => navigate('/Profile');
+  
 
   return (
     <div 

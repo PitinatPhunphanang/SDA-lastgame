@@ -11,62 +11,34 @@ function Leaderboard() {
   const handleGoHome = () => navigate('/');
 
 
-
-  // // เชื่อมต่อ WebSocket (multiuser ทำ leaderboard แบบ realtime)
-  // useEffect(() => {
-  //   const ws = new WebSocket('ws://localhost:8080');
-  
-  //   ws.onopen = () => {
-  //     console.log('Connected to WebSocket');
-  //   };
-  
-  //   ws.onmessage = (event) => {
-  //     const data = JSON.parse(event.data);
-  //     console.log('Received data:', data); // ตรวจสอบว่าข้อมูลถูกรับ
-  //     if (data.type === 'playerCreated' || data.type === 'playerUpdated') {
-  //       // อัปเดต Leaderboard เมื่อมีผู้เล่นใหม่หรืออัปเดต
-  //       setPlayers((prevPlayers) => {
-  //         const updatedPlayers = prevPlayers.filter((player) => player.id !== data.player.id);
-  //         updatedPlayers.push(data.player);
-  //         return updatedPlayers.sort((a, b) => b.score - a.score);
-  //       });
-  //     }
-  //   };
-
-  //   return () => {
-  //     ws.close();
-  //     console.log('Disconnected to WebSocket');
-  //   };
-  // }, []);
-
-  // ดึงข้อมูลผู้เล่นจาก Strapi
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        // เปลี่ยน URL ให้ตรงกับ API ของ Strapi ของคุณ
-        const response = await axios.get('http://localhost:1337/api/players'); // ดึงข้อมูลผู้เล่นและภาพ
-        console.log(response)
+        const response = await axios.get('http://localhost:1337/api/players?populate=*');
+        console.log(response); // ดูข้อมูลที่มีการ populate ชื่อผู้เล่น
         const sortedPlayers = response.data.data
           .map(player => ({
             ...player,
-            score: player.score || 0, // กำหนดค่าเริ่มต้นให้คะแนนเป็น 0 ถ้าไม่มีคะแนน
+            score: player.score || 0,
+            name: player.user?.username || null, // ดึงชื่อจาก relationship หรือใช้ null หากไม่มีชื่อ
           }))
-          .sort((a, b) => b.score - a.score) // เรียงลำดับจากคะแนนสูงสุดไปต่ำสุด
+          .filter(player => player.name !== null) // กรองผู้เล่นที่ไม่มีชื่อ
+          .sort((a, b) => b.score - a.score) // เรียงลำดับตามคะแนน
           .map((player, index) => ({
             ...player,
-            rank: index + 1, // เพิ่มลำดับที่ให้กับผู้เล่น
+            rank: index + 1, // เพิ่มลำดับให้กับผู้เล่น
           }));
-        setPlayers(sortedPlayers); // กำหนดค่าผลลัพธ์ลงใน state
-        setLoading(false); // ปิดสถานะโหลด
+        setPlayers(sortedPlayers);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching players:', error);
-        setLoading(false); // ปิดสถานะโหลด
+        setLoading(false);
       }
     };
-
+    
     fetchPlayers();
   }, []);
-
+  
   return (
     <div
       className="d-flex justify-content-center align-items-center min-vh-100"
