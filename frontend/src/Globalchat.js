@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios'; // นำเข้า axios
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 function GlobalChat() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState(''); // State สำหรับเก็บชื่อผู้ใช้
+  const navigate = useNavigate();
+
+  const handleGoHome = () => navigate('/');
 
   // ดึงข้อมูลผู้ใช้จาก Strapi API
   useEffect(() => {
@@ -99,11 +103,9 @@ function GlobalChat() {
         </div>
 
         {/* ลิงค์ไปหน้าหลัก */}
-        <div className="position-absolute" style={{ bottom: '20px', left: '20px' }}>
-          <a href="/" className="text-white fs-1">
-            🏠
-          </a>
-        </div>
+        <div className="position-absolute" style={{ bottom: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }} onClick={handleGoHome}>
+        <i className="bi bi-house"></i> 
+      </div>
       </div>
     </div>
   );

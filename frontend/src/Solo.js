@@ -365,7 +365,7 @@ function SinglePlayerGame() {
       <div 
         className="position-absolute" 
         style={{ 
-          top: displayedHint ? '65%' : '60%', // ขยับลงมาเมื่อมีคำใบ้
+          top: displayedHint ? '75%' : '70%', // ขยับลงมาเมื่อมีคำใบ้
           left: '50%', 
           transform: 'translateX(-50%)', 
           transition: 'top 0.3s ease' // เพิ่ม animation ให้การขยับ

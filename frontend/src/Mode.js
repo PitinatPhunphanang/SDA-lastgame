@@ -5,8 +5,8 @@ import { Modal, Button } from 'react-bootstrap';
 
 function ModeSelection() {
   const navigate = useNavigate();
-  const [time, setTime] = useState(2);  // เปลี่ยนค่าเริ่มต้นเป็น 2 นาที
-  const [timeDisplay, setTimeDisplay] = useState("2 นาที");  // เปลี่ยนข้อความเริ่มต้นเป็น "2 นาที"
+  const [time, setTime] = useState(2);  
+  const [timeDisplay, setTimeDisplay] = useState("2 นาที");  
   const [showModal, setShowModal] = useState(false);
 
   const handleGoHome = () => navigate('/');
@@ -21,7 +21,7 @@ function ModeSelection() {
   const handleSoloGame = () => navigate('/solo', { state: { time: time } });
   const handleGoLeaderboard = () => navigate('/Leaderboard');
   const handleProfileClick = () => navigate('/Profile');
-  
+  const handleChat = () => navigate('/globalchat');
 
   return (
     <div 
@@ -35,7 +35,6 @@ function ModeSelection() {
         height: '100vh',
       }}
     >
-      
       <div 
         style={{
           width: '500px',
@@ -93,6 +92,14 @@ function ModeSelection() {
         onClick={handleProfileClick}
       >
         <i className="bi bi-person-circle"></i>
+      </div>
+
+      <div 
+        className="position-absolute" 
+        style={{ top: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
+        onClick={handleChat}
+      >
+        <i className="bi bi-globe-asia-australia"></i>
       </div>
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
