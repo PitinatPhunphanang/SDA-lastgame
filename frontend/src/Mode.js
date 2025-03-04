@@ -1,12 +1,12 @@
 import React, { useState } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Modal, Button } from 'react-bootstrap';  // ใช้ React-Bootstrap สำหรับ Modal
+import { Modal, Button } from 'react-bootstrap';
 
 function ModeSelection() {
   const navigate = useNavigate();
-  const [time, setTime] = useState(1);
-  const [timeDisplay, setTimeDisplay] = useState("1 นาที");
+  const [time, setTime] = useState(2);  // เปลี่ยนค่าเริ่มต้นเป็น 2 นาที
+  const [timeDisplay, setTimeDisplay] = useState("2 นาที");  // เปลี่ยนข้อความเริ่มต้นเป็น "2 นาที"
   const [showModal, setShowModal] = useState(false);
 
   const handleGoHome = () => navigate('/');
@@ -20,7 +20,7 @@ function ModeSelection() {
   };
   const handleSoloGame = () => navigate('/solo', { state: { time: time } });
   const handleGoLeaderboard = () => navigate('/Leaderboard');
-  const handleProfileClick = () => navigate('/Profile'); //คลิกไอคอนโปรไฟล์
+  const handleProfileClick = () => navigate('/Profile');
 
   return (
     <div 
@@ -34,13 +34,6 @@ function ModeSelection() {
         height: '100vh',
       }}
     >
-      {/* ไอคอนร้านค้า */}
-      <div 
-        className="position-absolute" 
-        style={{ top: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
-      >
-        <i className="bi bi-shop"></i>
-      </div>
       
       <div 
         style={{
@@ -79,27 +72,12 @@ function ModeSelection() {
             </div>
           </button>
         </div>
-
-        <div className="d-flex justify-content-center mt-2 mb-3" style={{ width: '100%' }}>
-          <button className="btn btn-success py-3" style={{ fontSize: '1.5rem', width: '100%', borderRadius: '10px' }} onClick={handleMatching}>
-            1 v 1
-          </button>
-        </div>
-        
-        <div className="position-relative" style={{ width: 'auto', marginTop: '5px' }}>
-          <button className="btn btn-dark py-2 d-flex justify-content-center align-items-center" style={{ fontSize: '0.875rem', height: '45px', width: '170px', borderRadius: '0px' }}>
-            สร้างห้อง
-          </button>
-          <i className="bi bi-clock-history position-absolute" style={{ fontSize: '2rem', color: 'white', left: 'calc(100% + 10px)', top: '50%', transform: 'translateY(-50%)' }}></i>
-        </div>
       </div>
 
-      {/* ไอคอนกลับหน้าแรก */}
       <div className="position-absolute" style={{ bottom: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }} onClick={handleGoHome}>
         <i className="bi bi-house"></i> 
       </div>
 
-      {/* ไอคอน Leaderboard */}
       <div 
         className="position-absolute" 
         style={{ bottom: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
@@ -108,7 +86,6 @@ function ModeSelection() {
         <i className="bi bi-trophy"></i>
       </div>
 
-      {/* ไอคอนโปรไฟล์ */}
       <div 
         className="position-absolute" 
         style={{ top: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
@@ -117,23 +94,12 @@ function ModeSelection() {
         <i className="bi bi-person-circle"></i>
       </div>
 
-      {/* Modal สำหรับเลือกเวลา */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>เลือกเวลา</Modal.Title>
+          <Modal.Title>เวลา</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="d-flex flex-column">
-            <Button variant="primary" onClick={() => handleSelectTime(1)}>
-              1 นาที
-            </Button>
-            <Button variant="primary" onClick={() => handleSelectTime(5)} className="mt-2">
-              5 นาที
-            </Button>
-            <Button variant="primary" onClick={() => handleSelectTime(10)} className="mt-2">
-              10 นาที
-            </Button>
-          </div>
+          <p>เวลาในการเล่น: 2 นาที</p>
         </Modal.Body>
       </Modal>
     </div>

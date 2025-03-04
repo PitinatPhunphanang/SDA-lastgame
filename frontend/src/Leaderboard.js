@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
+
 
 function Leaderboard() {
   const [players, setPlayers] = useState([]); // State สำหรับเก็บข้อมูลผู้เล่น
   const [loading, setLoading] = useState(true); // ใช้สำหรับแสดงสถานะการโหลด
+  const navigate = useNavigate();
+  const handleGoHome = () => navigate('/');
+
+
 
   // // เชื่อมต่อ WebSocket (multiuser ทำ leaderboard แบบ realtime)
   // useEffect(() => {
@@ -79,14 +85,13 @@ function Leaderboard() {
           กระดานผู้นำ
         </h2>
 
-        {/* Dropdown สำหรับเลือกเวลา */}
-        <div className="mb-4">
+         {/* Dropdown สำหรับเลือกเวลา (เลือกได้แค่ 2 นาที) */}
+         <div className="mb-4">
           <select className="form-select w-50 mx-auto" style={{ fontSize: '1rem' }}>
-            <option>เวลา 5:00 นาที</option>
-            <option>เวลา 10:00 นาที</option>
-            <option>เวลา 15:00 นาที</option>
+            <option>เวลา 2:00 นาที</option>
           </select>
         </div>
+
 
         {/* ตารางผู้เล่น */}
         {loading ? (
@@ -117,11 +122,9 @@ function Leaderboard() {
         )}
 
         {/* ลิงค์ไปหน้าหลัก */}
-        <div className="position-absolute" style={{ bottom: '20px', left: '20px' }}>
-          <a href="/" className="text-white fs-1">
-            🏠
-          </a>
-        </div>
+        <div className="position-absolute" style={{ bottom: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }} onClick={handleGoHome}>
+        <i className="bi bi-house"></i> 
+      </div>
       </div>
     </div>
   );

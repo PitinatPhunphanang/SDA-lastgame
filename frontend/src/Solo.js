@@ -21,7 +21,18 @@ function SinglePlayerGame() {
   const [hint, setHint] = useState("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(1);
+  const [hintCount, setHintCount] = useState(3); // เริ่มต้นมี 3 คำใบ้
+  const [displayedHint, setDisplayedHint] = useState(""); // สำหรับแสดงคำใบ้
   const [userName, setUserName] = useState(""); // สร้าง state สำหรับเก็บ username
+  const [resultMessage, setResultMessage] = useState(""); // เพิ่ม state สำหรับเก็บข้อความผลลัพธ์
+
+  // ฟังก์ชันแสดงข้อความชั่วคราว
+  const showResultMessage = (message) => {
+    setResultMessage(message);
+    setTimeout(() => {
+      setResultMessage("");
+    }, 3000); // ข้อความจะหายไปหลังจาก 3 วินาที
+  };
 
   // ฟังก์ชันดึงข้อมูลผู้ใช้จาก token
   const getUserDetails = async () => {
@@ -81,6 +92,17 @@ function SinglePlayerGame() {
     }
   };
 
+  useEffect(() => {
+    if (currentQuestionIndex >= totalQuestions) {
+      clearInterval(gameInterval);
+      setGameOver(true);
+    } else {
+      fetchQuestionImage(currentQuestionIndex);
+      setDisplayedHint(""); // รีเซ็ตคำใบ้เมื่อเปลี่ยนคำถาม
+    }
+  }, [currentQuestionIndex]);
+  
+
   // เริ่มต้นนับเวลา
   useEffect(() => {
     if (gameInterval) {
@@ -115,7 +137,12 @@ function SinglePlayerGame() {
   };
 
   const handleHint = () => {
-    alert(`คำใบ้: ${hint}`);
+    if (hintCount > 0) {
+      setDisplayedHint(`คำใบ้: ${hint}`);
+      setHintCount(hintCount - 1);
+    } else {
+      setDisplayedHint("คุณใช้คำใบ้หมดแล้ว");
+    }
   };
 
   const formatTime = (seconds) => {
@@ -128,7 +155,7 @@ function SinglePlayerGame() {
     if (gameOver) {
       handleExitGame();
     } else {
-      clearInterval(gameInterval);
+      //clearInterval(gameInterval);
       setShowExitModal(true);
     }
   };
@@ -161,7 +188,10 @@ function SinglePlayerGame() {
     setPoints(0);
     setTotalTimeUsed(0);
     setCurrentQuestionIndex(0);
+    setDisplayedHint(""); // เคลียร์คำใบ้เมื่อเริ่มเกมใหม่
+    setHintCount(3); // รีเซ็ตคำใบ้เป็น 3
   };
+
 
   const fetchQuestionImage = async (index) => {
     try {
@@ -200,13 +230,40 @@ function SinglePlayerGame() {
     console.log('User Answer:', answer.trim());
     console.log('Correct Answer:', correctAnswer);
     if (answer.trim() === correctAnswer) {
-      alert("คำตอบถูกต้อง!");
+      showResultMessage("คำตอบถูกต้อง!"); // แสดงข้อความแทนการใช้ alert
       setPoints(points + 10);
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
       setAnswer("");
     } else {
-      alert("คำตอบไม่ถูกต้อง");
+      showResultMessage("คำตอบไม่ถูกต้อง"); // แสดงข้อความแทนการใช้ alert
     }
+  };
+
+  // ส่วนแสดงผลข้อความผลลัพธ์
+  const renderResultMessage = () => {
+    if (resultMessage) {
+      return (
+        <div
+          style={{
+            position: 'fixed',
+            top: '2.5%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: resultMessage === "คำตอบถูกต้อง!" ? 'green' : 'red',
+            color: 'white',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+            zIndex: 1000,
+            fontSize: '1.2rem',
+            textAlign: 'center',
+          }}
+        >
+          {resultMessage}
+        </div>
+      );
+    }
+    return null;
   };
 
   useEffect(() => {
@@ -250,26 +307,70 @@ function SinglePlayerGame() {
         <i className="bi bi-door-open"></i>
       </div>
 
-      {/* ไอคอนคำใบ้ */}
-      <div
-        className="position-absolute"
-        style={{ bottom: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}
+            {/* ไอคอนคำใบ้ */}
+            <div
+        className="position-absolute d-flex align-items-center"
+        style={{ bottom: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer', position: 'relative' }}
         onClick={handleHint}
       >
         <i className="bi bi-lightbulb"></i>
+        {hintCount > 0 && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '-10px',
+              right: '-10px',
+              backgroundColor: 'red',
+              color: 'white',
+              borderRadius: '50%',
+              width: '25px',
+              height: '25px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '1rem',
+              fontWeight: 'bold'
+            }}
+          >
+            {hintCount}
+          </span>
+        )}
       </div>
 
-      {/* รูปภาพคำถาม */}
+      {/* รูปภาพคำถามและคำใบ้ */}
       <div className="position-absolute" style={{ top: '10%', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
         {questionImage ? (
           <img src={questionImage} alt="Question" style={{ width: '600px', height: 'auto', borderRadius: '10px' }} />
         ) : (
           <div>กำลังโหลดภาพ...</div>
         )}
+        {/* แสดงคำใบ้ด้านล่างภาพคำถาม */}
+        {displayedHint && (
+          <div style={{ 
+            marginTop: '20px', 
+            fontSize: '1.2rem', 
+            color: 'black', 
+            backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+            padding: '10px', 
+            borderRadius: '5px',
+            width: '600px',
+            textAlign: 'center'
+          }}>
+            {displayedHint}
+          </div>
+        )}
       </div>
 
-      {/* ช่องกรอกคำตอบ */}
-      <div className="position-absolute" style={{ bottom: '100px', left: '50%', transform: 'translateX(-50%)' }}>
+      {/* ช่องกรอกคำตอบและปุ่มส่ง */}
+      <div 
+        className="position-absolute" 
+        style={{ 
+          top: displayedHint ? '65%' : '60%', // ขยับลงมาเมื่อมีคำใบ้
+          left: '50%', 
+          transform: 'translateX(-50%)', 
+          transition: 'top 0.3s ease' // เพิ่ม animation ให้การขยับ
+        }}
+      >
         <input
           type="text"
           value={answer}
@@ -280,6 +381,9 @@ function SinglePlayerGame() {
         />
         <button className="btn btn-success mt-2" onClick={handleSubmitAnswer}>ส่งคำตอบ</button>
       </div>
+
+      {/* แสดงข้อความผลลัพธ์ */}
+      {renderResultMessage()}
 
       {gameOver ? (
         <div
@@ -298,19 +402,27 @@ function SinglePlayerGame() {
             zIndex: 1000
           }}
         >
-          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '20px' }}>หมดเวลา</div>
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '20px' }}>หมดเวลา!</div>
           <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>เวลาที่ใช้ไป: {formatTime(totalTimeUsed)}</div>
           <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>คะแนน: {points}</div>
           <div style={{ fontSize: '1.5rem', marginBottom: '20px' }}>คะแนนสูงสุด: </div>
 
           <div className="d-flex mb-3" style={{ gap: '10px', width: '100%', position: 'relative' }}>
-            <button
-              className="btn btn-success mt-3"
-              style={{ fontSize: '1.2rem', padding: '10px 20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', width: '100%' }}
-              onClick={handlePlayagain}
-            >
-              เล่นอีกครั้ง
-            </button>
+          <button
+        className="btn btn-success mt-3"
+        style={{ fontSize: '1.2rem', padding: '10px 20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', width: '100%' }}
+        onClick={() => {
+          setTime(120); // บังคับเวลาเป็น 2 นาที (120 วินาที)
+          setGameOver(false);
+          setPoints(0);
+          setTotalTimeUsed(0);
+          setCurrentQuestionIndex(0);
+          setDisplayedHint(""); // เคลียร์คำใบ้เมื่อเริ่มเกมใหม่
+          setHintCount(3); // รีเซ็ตคำใบ้เป็น 3
+        }}
+      >
+        เล่นอีกครั้ง
+      </button>
 
             {showTimeSelection && (
               <div
@@ -329,15 +441,7 @@ function SinglePlayerGame() {
                   marginTop: '10px'
                 }}
               >
-                <button className="dropdown-item" style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }} onClick={() => handleTimeChange(60)}>
-                  1 นาที
-                </button>
-                <button className="dropdown-item" style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }} onClick={() => handleTimeChange(300)}>
-                  5 นาที
-                </button>
-                <button className="dropdown-item" style={{ fontSize: '1.1rem', padding: '8px 12px', borderRadius: '5px' }} onClick={() => handleTimeChange(600)}>
-                  10 นาที
-                </button>
+                
               </div>
             )}
           </div>

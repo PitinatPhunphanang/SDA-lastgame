@@ -9,8 +9,13 @@ function Home() {
   const navigate = useNavigate();  // ใช้ navigate สำหรับการเปลี่ยนหน้า
   // ฟังก์ชันเมื่อกดเริ่มเกม
   const handleStart = () => {
-    setShowModal(true); // เปิดป๊อปอัพ
-    setShowStartButton(false); // ซ่อนปุ่มเริ่ม
+    const token = sessionStorage.getItem("authToken");
+    if (token) {
+      navigate("/Mode"); // ถ้าล็อกอินอยู่แล้ว ไปที่ Mode ทันที
+    } else {
+      setShowModal(true);
+      setShowStartButton(false);
+    }
   };
 
   const handleLogin = () => {
