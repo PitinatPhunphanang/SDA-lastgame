@@ -19,9 +19,9 @@ services:
       - tick
 
   web_server:
-    container_name: web-server
+    container_name: backend
     build: 
-      context: ./web-server
+      context: ./backend
       dockerfile: ./Dockerfile
     depends_on:
       - mysql
@@ -33,6 +33,7 @@ services:
       DB_PASSWORD: tick000
     ports:
       - 127.0.0.1:8000:8000
+      - "8080:8080"  # เปิดพอร์ต 8080 เพื่อให้เข้าถึงได้จากภายนอก
     restart: always
     networks:
       - tick

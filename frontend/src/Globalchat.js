@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 import axios from 'axios'; // นำเข้า axios
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
+import conf from './conf/main';
 
 function GlobalChat() {
   const [messages, setMessages] = useState([]);
@@ -18,7 +19,7 @@ function GlobalChat() {
     const fetchUser = async () => {
       try {
         const token = sessionStorage.getItem('authToken'); // รับ JWT token จาก localStorage
-        const response = await axios.get('http://localhost:1337/api/users/me', {
+        const response = await axios.get(`${conf.apiUrlPrefix}/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`, // ส่ง token ไปกับ header
           },
@@ -34,7 +35,7 @@ function GlobalChat() {
 
   // เชื่อมต่อ Socket เมื่อ Component ถูกโหลด
   useEffect(() => {
-    const newSocket = io('http://localhost:8080');
+    const newSocket = io(`${conf.globalchat}:8080`);
     setSocket(newSocket);
 
     // ส่งชื่อผู้ใช้ไปยัง Server เมื่อเชื่อมต่อ

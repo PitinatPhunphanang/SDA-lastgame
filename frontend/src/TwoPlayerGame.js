@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import conf from './conf/main';
 
 function TwoPlayerGame() {
   const navigate = useNavigate();
@@ -79,10 +80,10 @@ function TwoPlayerGame() {
   useEffect(() => {
     const fetchQuestionImage = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/questions?populate=image');
+        const response = await axios.get(`${conf.apiUrlPrefix}/questions?populate=image`);
         const questionData = response.data.data[0];
         if (questionData && questionData.image) {
-          setQuestionImage(`http://localhost:1337${questionData.image.url}`);
+          setQuestionImage(`${conf.apiUrlPrefix}${questionData.image.url}`);
         }
       } catch (error) {
         console.error("Error fetching question image:", error);

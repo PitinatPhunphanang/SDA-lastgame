@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './style.css';
+import conf from './conf/main';
 
 function SignUp() {
   const [name, setName] = useState('');
@@ -14,7 +15,7 @@ function SignUp() {
     e.preventDefault();
     try {
       // ส่งข้อมูลไปที่ API ของ Strapi สำหรับการสมัครสมาชิก
-      const response = await axios.post('http://localhost:1337/api/auth/local/register', {
+      const response = await axios.post(`${conf.apiUrlPrefix}/auth/local/register`, {
         username: name,
         email: email,
         password: password,
@@ -26,7 +27,7 @@ function SignUp() {
 
       console.log('User created:', response.data);
 
-      const pulltoken = await axios.post('http://localhost:1337/api/auth/local', {
+      const pulltoken = await axios.post(`${conf.apiUrlPrefix}/auth/local`, {
         identifier: email,
         password: password,
       });

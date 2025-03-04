@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './style.css';
+import conf from './conf/main';
 
 function Signin() {
   const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ function Signin() {
     e.preventDefault();
     try {
       // ส่งข้อมูลไปที่ API ของ Strapi
-      const response = await axios.post('http://localhost:1337/api/auth/local', {
+      const response = await axios.post(`${conf.apiUrlPrefix}/auth/local`, {
         identifier: email,
         password: password,
       });

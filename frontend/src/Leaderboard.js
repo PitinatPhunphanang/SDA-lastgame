@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
-
+import conf from './conf/main';
 
 function Leaderboard() {
   const [players, setPlayers] = useState([]); // State สำหรับเก็บข้อมูลผู้เล่น
@@ -14,7 +14,7 @@ function Leaderboard() {
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const response = await axios.get('http://localhost:1337/api/players?populate=*');
+        const response = await axios.get(`${conf.apiUrlPrefix}/players?populate=*`);
         console.log(response); // ดูข้อมูลที่มีการ populate ชื่อผู้เล่น
         const sortedPlayers = response.data.data
           .map(player => ({

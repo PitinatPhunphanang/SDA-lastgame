@@ -1,3 +1,4 @@
+const conf = require('./main');
 const http = require('http').createServer();
 const io = require('socket.io')(http, {
   cors: { origin: '*' }, // อนุญาตให้ทุก origin เชื่อมต่อ
@@ -31,4 +32,4 @@ io.on('connection', (socket) => {
   });
 });
 
-http.listen(8080, () => console.log('Socket.IO server is running on http://localhost:8080'));
+http.listen(8080, () => console.log(`Socket.IO server is running on http://localhost:8080`));

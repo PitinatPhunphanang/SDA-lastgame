@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import conf from './conf/main';
 
 function SinglePlayerGame() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ function SinglePlayerGame() {
     const token = sessionStorage.getItem("authToken"); // ดึง token จาก sessionStorage
     if (token) {
       try {
-        const response = await axios.get("http://localhost:1337/api/users/me", {
+        const response = await axios.get(`${conf.apiUrlPrefix}/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`, // ใส่ Token ใน header
           },
@@ -68,7 +69,7 @@ function SinglePlayerGame() {
 
     try {
       // เรียกข้อมูลผู้ใช้ที่ล็อกอิน
-      const response = await axios.get("http://localhost:1337/api/users/me", {
+      const response = await axios.get(`${conf.apiUrlPrefix}/users/me`, {
         headers: {
           Authorization: `Bearer ${token}`, // ส่ง token ใน headers
         },
@@ -76,7 +77,7 @@ function SinglePlayerGame() {
 
       // ส่งข้อมูลคะแนนพร้อมกับ userId ไปยัง API
       const userId = response.data.id; // ดึง userId จาก response
-      const scoreResponse = await axios.post("http://localhost:1337/api/players", {
+      const scoreResponse = await axios.post(`${conf.apiUrlPrefix}/players`, {
         data: {
           score: finalPoints,
           user: userId,  // ส่ง userId ไปในข้อมูล

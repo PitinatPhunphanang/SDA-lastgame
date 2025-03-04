@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
+import conf from "./conf/main";
 
 function Profile() {
   const [user, setUser] = useState(null); // ข้อมูลผู้ใช้ที่ล็อกอินอยู่
@@ -18,7 +19,7 @@ function Profile() {
       }
 
       try {
-        const response = await axios.get("http://localhost:1337/api/users/me", {
+        const response = await axios.get(`${conf.apiUrlPrefix}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
