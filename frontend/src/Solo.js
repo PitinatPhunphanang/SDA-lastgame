@@ -156,7 +156,6 @@ function SinglePlayerGame() {
     if (gameOver) {
       handleExitGame();
     } else {
-      //clearInterval(gameInterval);
       setShowExitModal(true);
     }
   };
@@ -194,6 +193,7 @@ function SinglePlayerGame() {
   };
 
 
+  // ฟังก์ชันดึงข้อมูลคำถาม
   const fetchQuestionImage = async (index) => {
     try {
       const response = await axios.get("http://localhost:1337/api/games?populate=*");
@@ -214,14 +214,33 @@ function SinglePlayerGame() {
     }
   };
 
+  // ใช้ Promise.all เพื่อให้ดึงข้อมูลทั้งสอง (ข้อมูลผู้ใช้ และคำถาม) พร้อมกัน
   useEffect(() => {
-    if (currentQuestionIndex >= totalQuestions) {
-      clearInterval(gameInterval);
-      setGameOver(true);
-    } else {
-      fetchQuestionImage(currentQuestionIndex);
-    }
-  }, [currentQuestionIndex]);
+    const fetchData = async () => {
+      const token = sessionStorage.getItem("authToken");
+      if (token) {
+        const userDetails = axios.get(`${conf.apiUrlPrefix}/users/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const questionDetails = axios.get("http://localhost:1337/api/games?populate=*");
+
+        try {
+          const [userResponse, questionResponse] = await Promise.all([userDetails, questionDetails]);
+          console.log("User Details:", userResponse.data);
+          console.log("Question Details:", questionResponse.data);
+          setUserName(userResponse.data.username);
+          setTotalQuestions(questionResponse.data.data.length);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleAnswerChange = (e) => {
     setAnswer(e.target.value);
@@ -274,7 +293,7 @@ function SinglePlayerGame() {
         submitScore(points); // ส่งคะแนนไปที่ API เมื่อเกมจบ
       }
     }
-  }, [gameOver, points]); // เพิ่ม dependencies ใน useEffect เพื่อให้ทำงานเมื่อคะแนนหรือ gameOver เปลี่ยนแปลง
+  }, [gameOver, points]);
 
   return (
     <div
