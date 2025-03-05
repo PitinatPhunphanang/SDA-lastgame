@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './style.css';
@@ -8,13 +8,88 @@ function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
   const navigate = useNavigate();
 
-  // ฟังก์ชันสำหรับการเข้าสู่ระบบ
+  // ฟังก์ชันคำนวณเวลาบล็อกตามจำนวนครั้งที่ล็อกอินผิดพลาด
+  const calculateBlockTime = (attempts) => {
+    if (attempts === 5) return 1 * 60 * 1000; // 1 นาที
+    if (attempts === 6) return 5 * 60 * 1000; // 5 นาที
+    if (attempts >= 7) return 10 * 60 * 1000; // 10 นาที
+    return 0; // ไม่บล็อก
+  };
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('authToken');
+    if (token) {
+      navigate('/mode');
+    }
+
+    // โหลดข้อมูลจาก localStorage
+    const storedAttempts = localStorage.getItem('loginAttempts');
+    const storedBlocked = localStorage.getItem('isBlocked');
+    const storedBlockTime = localStorage.getItem('blockTime');
+
+    if (storedAttempts) {
+      setLoginAttempts(parseInt(storedAttempts));
+    }
+
+    if (storedBlocked === 'true') {
+      const currentTime = Date.now();
+      const blockTime = parseInt(storedBlockTime);
+      const timePassed = currentTime - blockTime;
+
+      // คำนวณเวลาบล็อกที่เหลือ
+      const remainingBlockTime = calculateBlockTime(loginAttempts) - timePassed;
+
+      if (remainingBlockTime <= 0) {
+        setIsBlocked(false);
+        setLoginAttempts(0); // รีเซ็ตจำนวนครั้งที่ล็อกอินผิดพลาด
+        localStorage.setItem('isBlocked', 'false');
+        localStorage.setItem('blockTime', '');
+        localStorage.setItem('loginAttempts', '0'); // ล้างจำนวนครั้งที่ล็อกอินผิดพลาด
+      } else {
+        setIsBlocked(true);
+      }
+    }
+
+    // ตั้งค่า interval เพื่อตรวจสอบเวลาบล็อกทุกๆ วินาที
+    const interval = setInterval(() => {
+      const storedBlocked = localStorage.getItem('isBlocked');
+      const storedBlockTime = localStorage.getItem('blockTime');
+
+      if (storedBlocked === 'true') {
+        const currentTime = Date.now();
+        const blockTime = parseInt(storedBlockTime);
+        const timePassed = currentTime - blockTime;
+
+        // คำนวณเวลาบล็อกที่เหลือ
+        const remainingBlockTime = calculateBlockTime(loginAttempts) - timePassed;
+
+        if (remainingBlockTime <= 0) {
+          setIsBlocked(false);
+          setLoginAttempts(0); // รีเซ็ตจำนวนครั้งที่ล็อกอินผิดพลาด
+          localStorage.setItem('isBlocked', 'false');
+          localStorage.setItem('blockTime', '');
+          localStorage.setItem('loginAttempts', '0'); // ล้างจำนวนครั้งที่ล็อกอินผิดพลาด
+        }
+      }
+    }, 1000); // ตรวจสอบทุกๆ 1 วินาที
+
+    // ทำความสะอาด interval เมื่อคอมโพเนนต์ถูกถอดออก
+    return () => clearInterval(interval);
+  }, [navigate, loginAttempts]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (isBlocked) {
+      setError('บัญชีของคุณถูกบล็อกชั่วคราว กรุณาลองใหม่ในภายหลัง');
+      return;
+    }
+
     try {
-      // ส่งข้อมูลไปที่ API ของ Strapi
       const response = await axios.post(`${conf.apiUrlPrefix}/auth/local`, {
         identifier: email,
         password: password,
@@ -27,19 +102,30 @@ function Signin() {
       console.log('Login successful');
       console.log(response.data);
 
-      // เปลี่ยนหน้าไปที่หน้าเกม
+      setLoginAttempts(0);
+      localStorage.setItem('loginAttempts', 0);
+
       navigate('/mode');
     } catch (error) {
       console.error('Error:', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message[0].messages[0].message);
+
+      const newLoginAttempts = loginAttempts + 1;
+      setLoginAttempts(newLoginAttempts);
+      localStorage.setItem('loginAttempts', newLoginAttempts);
+
+      if (newLoginAttempts >= 5) {
+        const blockTime = calculateBlockTime(newLoginAttempts);
+        setIsBlocked(true);
+        localStorage.setItem('isBlocked', 'true');
+        const currentTime = Date.now();
+        localStorage.setItem('blockTime', currentTime.toString());
+        setError(`บัญชีของคุณถูกบล็อกชั่วคราว กรุณาลองใหม่ใน ${blockTime / (60 * 1000)} นาที`);
       } else {
-        setError('An error occurred while logging in.');
+        setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
       }
     }
   };
 
-  // ฟังก์ชันสำหรับการไปที่หน้าสมัครสมาชิก
   const handleSignUpClick = () => {
     navigate('/signup');
   };
@@ -48,12 +134,12 @@ function Signin() {
     <div
       className="d-flex justify-content-center align-items-center min-vh-100"
       style={{
-        backgroundImage: 'url(/777.gif)',  
-        backgroundSize: 'cover',          
-        backgroundPosition: 'center',     
-        backgroundRepeat: 'no-repeat',    
-        position: 'relative',             
-        height: '100vh',                   
+        backgroundImage: 'url(/777.gif)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        position: 'relative',
+        height: '100vh',
       }}
     >
       <div style={{ width: '500px', textAlign: 'center', backgroundColor: 'rgba(0, 0, 0, 0.6)', padding: '20px', borderRadius: '15px' }}>
@@ -81,18 +167,17 @@ function Signin() {
               required
             />
           </div>
-          {error && <p className="text-red-500">{error}</p>} {/* แสดงข้อความผิดพลาด */}
+          {error && <p className="text-danger">{error}</p>}
 
           <button type="submit" className="btn btn-success w-100 py-3" style={{ fontSize: '1.7rem', borderRadius: '12px' }}>
             เข้าสู่ระบบ
           </button>
         </form>
 
-        {/* ข้อความสำหรับผู้ที่ยังไม่มีบัญชี */}
         <div className="mt-3">
           <p className="text-light">
             ยังไม่มีบัญชี?{' '}
-            <button onClick={handleSignUpClick} className="text-blue-500 hover:underline">
+            <button onClick={handleSignUpClick} className="btn btn-link text-light p-0">
               คลิกที่นี่เพื่อสมัครสมาชิก
             </button>
           </p>
@@ -100,7 +185,7 @@ function Signin() {
         <div className="mt-3">
           <p className="text-light">
             หรือ{' '}
-            <button onClick={() => navigate('/mode')} className="text-blue-500 hover:underline">
+            <button onClick={() => navigate('/mode')} className="btn btn-link text-light p-0">
               เข้าเล่นโดยไม่เข้าสู่ระบบ
             </button>
           </p>
