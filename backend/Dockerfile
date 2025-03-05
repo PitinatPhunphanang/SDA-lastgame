@@ -16,6 +16,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-EXPOSE 8000
-EXPOSE 8080
-CMD [ "node", "src/server.js" ]
+# Expose ports for backend and websocket
+EXPOSE 8000 8080
+
+# Start both Strapi and WebSocket
+CMD ["npm", "run", "dev"]

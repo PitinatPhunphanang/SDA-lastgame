@@ -9,8 +9,8 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "strapi": "strapi",
-    "websocket": "node src/websocket.js",
-    "dev": "concurrently \"npm run develop\" \"npm run websocket\""
+    "start:websocket": "node src/websocket.js",
+    "dev": "concurrently \"strapi develop\" \"node src/websocket.js\""
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.10.4",

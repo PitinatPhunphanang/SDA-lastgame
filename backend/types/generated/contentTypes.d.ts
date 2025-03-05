@@ -397,6 +397,34 @@ export interface ApiGameGame extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiOtherdatawOtherdataw extends Struct.CollectionTypeSchema {
+  collectionName: 'otherdataws';
+  info: {
+    description: '';
+    displayName: 'Otherdataw';
+    pluralName: 'otherdataws';
+    singularName: 'otherdataw';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::otherdataw.otherdataw'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
   collectionName: 'players';
   info: {
@@ -973,6 +1001,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::game.game': ApiGameGame;
+      'api::otherdataw.otherdataw': ApiOtherdatawOtherdataw;
       'api::player.player': ApiPlayerPlayer;
       'api::username.username': ApiUsernameUsername;
       'plugin::content-releases.release': PluginContentReleasesRelease;

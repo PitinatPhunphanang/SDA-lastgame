@@ -1,42 +1,40 @@
-version: '3'
+version: '3.8'
 services:
-  mysql:
-    container_name: mysql
-    image: mysql/mysql-server
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    environment:
-      MYSQL_DATABASE: tick
-      MYSQL_ROOT_PASSWORD: tick000
-      MYSQL_ROOT_HOST: '%'
-    ports:
-      - 127.0.0.1:3306:3306
-    volumes:
-      - /opt/docker-volumes/mysql:/var/lib/mysql
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    restart: always
-    networks:
-      - tick
-
-  web_server:
-    container_name: backend
+  backend:
     build: 
       context: ./backend
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     depends_on:
       - mysql
     environment:
       NODE_ENV: production
-      DB_DATABASE: tick
-      DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: tick000
-    ports:
-      - 127.0.0.1:8000:8000
-      - "8080:8080"  # เปิดพอร์ต 8080 เพื่อให้เข้าถึงได้จากภายนอก
-    restart: always
+      DATABASE_CLIENT: mysql
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: game_db
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root_password
     networks:
-      - tick
+      - app_network
+
+  mysql:
+    image: mysql/mysql-server
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: game_db
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
 
 networks:
-  tick:
+  app_network:
+
+volumes:
+  mysql_data:

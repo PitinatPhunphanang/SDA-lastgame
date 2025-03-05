@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "otherdataws",
+  "info": {
+    "singularName": "otherdataw",
+    "pluralName": "otherdataws",
+    "displayName": "Otherdataw",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {}
+}

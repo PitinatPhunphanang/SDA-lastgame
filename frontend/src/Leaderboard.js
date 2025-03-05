@@ -7,20 +7,27 @@ import conf from './conf/main';
 function Leaderboard() {
   const [players, setPlayers] = useState([]); // State สำหรับเก็บข้อมูลผู้เล่น
   const [loading, setLoading] = useState(true); // ใช้สำหรับแสดงสถานะการโหลด
+  const [selectedTime, setSelectedTime] = useState("2:00 นาที"); // สำหรับเลือกเวลา
   const navigate = useNavigate();
-  const handleGoHome = () => navigate('/');
 
+  const handleGoHome = () => navigate('/');
 
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const response = await axios.get(`${conf.apiUrlPrefix}/players?populate=*`);
-        console.log(response); // ดูข้อมูลที่มีการ populate ชื่อผู้เล่น
-        const sortedPlayers = response.data.data
+        setLoading(true); // เริ่มต้นการโหลด
+        const response1 = axios.get(`${conf.apiUrlPrefix}/players?populate=*`);
+        
+        // ใช้ Promise.all() เพื่อให้ดึงข้อมูลทั้งหมดพร้อมกัน (ในกรณีต้องการดึงข้อมูลอื่นๆ)
+        const [playersResponse] = await Promise.all([response1]);
+
+        console.log(playersResponse); // ดูข้อมูลที่ได้รับจาก API ของผู้เล่น
+
+        const sortedPlayers = playersResponse.data.data
           .map(player => ({
             ...player,
             score: player.score || 0,
-            name: player.user?.username || null, // ดึงชื่อจาก relationship หรือใช้ null หากไม่มีชื่อ
+            name: player.user?.username || null,
           }))
           .filter(player => player.name !== null) // กรองผู้เล่นที่ไม่มีชื่อ
           .sort((a, b) => b.score - a.score) // เรียงลำดับตามคะแนน
@@ -28,6 +35,7 @@ function Leaderboard() {
             ...player,
             rank: index + 1, // เพิ่มลำดับให้กับผู้เล่น
           }));
+
         setPlayers(sortedPlayers);
         setLoading(false);
       } catch (error) {
@@ -35,10 +43,10 @@ function Leaderboard() {
         setLoading(false);
       }
     };
-    
+
     fetchPlayers();
-  }, []);
-  
+  }, [selectedTime]); // เมื่อเลือกเวลาใหม่, เรียก fetch ใหม่
+
   return (
     <div
       className="d-flex justify-content-center align-items-center min-vh-100"
@@ -57,13 +65,18 @@ function Leaderboard() {
           กระดานผู้นำ
         </h2>
 
-         {/* Dropdown สำหรับเลือกเวลา (เลือกได้แค่ 2 นาที) */}
-         <div className="mb-4">
-          <select className="form-select w-50 mx-auto" style={{ fontSize: '1rem' }}>
-            <option>เวลา 2:00 นาที</option>
+        {/* Dropdown สำหรับเลือกเวลา */}
+        <div className="mb-4">
+          <select
+            className="form-select w-50 mx-auto"
+            style={{ fontSize: '1rem' }}
+            value={selectedTime}
+            onChange={(e) => setSelectedTime(e.target.value)} // ค่าที่เลือกจะเปลี่ยนแปลงใน state
+          >
+            <option value="2:00 นาที">เวลา 2:00 นาที</option>
+            
           </select>
         </div>
-
 
         {/* ตารางผู้เล่น */}
         {loading ? (
@@ -75,7 +88,6 @@ function Leaderboard() {
                 <th className="text-center">ลำดับที่</th>
                 <th className="text-center">ชื่อ</th>
                 <th className="text-center">คะแนน</th>
-                
               </tr>
             </thead>
             <tbody>
@@ -95,8 +107,8 @@ function Leaderboard() {
 
         {/* ลิงค์ไปหน้าหลัก */}
         <div className="position-absolute" style={{ bottom: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }} onClick={handleGoHome}>
-        <i className="bi bi-house"></i> 
-      </div>
+          <i className="bi bi-house"></i> 
+        </div>
       </div>
     </div>
   );
