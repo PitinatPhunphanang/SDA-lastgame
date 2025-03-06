@@ -15,5 +15,4 @@ USER node
 RUN ["npm", "run", "build"]
 EXPOSE 1337
 EXPOSE 8080
-ENTRYPOINT ["npm", "run", "start"]
-CMD ["node", "./backend/src/index.js"]
+CMD ["npm", "run", "start"]
