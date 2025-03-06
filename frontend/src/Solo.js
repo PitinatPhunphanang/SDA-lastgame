@@ -314,9 +314,9 @@ function SinglePlayerGame() {
       </div>
 
       {/* ไอคอนโปรไฟล์ */}
-      <div className="position-absolute" style={{ top: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}>
+      {/*<div className="position-absolute" style={{ top: '20px', right: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }}>
         <i className="bi bi-person-circle"></i>
-      </div>
+      </div>*/}
 
       {/* ไอคอนออกเกม */}
       <div
@@ -422,10 +422,10 @@ function SinglePlayerGame() {
             zIndex: 1000
           }}
         >
-          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '20px' }}>หมดเวลา!</div>
+          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '20px' }}>จบเกม!</div>
           <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>เวลาที่ใช้ไป: {formatTime(totalTimeUsed)}</div>
           <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>คะแนน: {points}</div>
-          <div style={{ fontSize: '1.5rem', marginBottom: '20px' }}>คะแนนสูงสุด: </div>
+          {/*<div style={{ fontSize: '1.5rem', marginBottom: '20px' }}>คะแนนสูงสุด: </div>*/}
 
           <div className="d-flex mb-3" style={{ gap: '10px', width: '100%', position: 'relative' }}>
           <button
@@ -481,6 +481,7 @@ function SinglePlayerGame() {
           <div className="modal-dialog d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
             <div className="modal-content" style={{ width: '400px', padding: '20px', backgroundColor: 'white' }}>
               <h4>คุณต้องการออกจากเกมหรือไม่?</h4>
+              <p>คำเตือน: คะแนนของคุณจะไม่ถูกบันทึก</p>
               <div className="d-flex justify-content-between mt-3">
                 <button className="btn btn-success" onClick={handleContinueGame}>เล่นต่อ</button>
                 <button className="btn btn-danger" onClick={handleConfirmExit}>ออก</button>

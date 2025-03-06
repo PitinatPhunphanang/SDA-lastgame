@@ -42,6 +42,11 @@ function Home() {
       navigate('/Profile'); // ถ้าล็อกอินแล้วไปที่หน้าโปรไฟล์
   };
 
+  const handleGuideClick = () => {
+    navigate('/Guide'); // เปลี่ยนไปที่หน้าคู่มือ
+  };
+  
+
   return (
     <div
       className="d-flex justify-content-center align-items-center min-vh-100"
@@ -128,13 +133,13 @@ function Home() {
           color: 'white',
           cursor: 'pointer'
         }}
-        //onClick=
+        onClick={handleGuideClick}
       >
         <i className="bi bi-question-circle"></i>
       </div>
 
       {/* ไอคอนการตั้งค่า (ล่างซ้าย) */}
-      <div
+      {/*<div
         className="position-absolute"
         style={{
           bottom: '20px',
@@ -147,7 +152,7 @@ function Home() {
         //onClick=
       >
         <i className="bi bi-gear"></i>
-      </div>
+      </div>*/}
     </div>
   );
 }

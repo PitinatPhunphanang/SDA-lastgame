@@ -12,6 +12,7 @@ import TwoPlayerGame from './TwoPlayerGame';
 import ProtectedRoute from "./ProtectedRoute"; // Import Protected Route
 import Profile from './profile';
 import GlobalChat from './Globalchat';
+import Guide from './Guide';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/matching" element={<Matching />} />
           <Route path="/Leaderboard" element={<Leaderboard />} />
           <Route path="/TwoPlayerGame" element={<TwoPlayerGame />} />
+          <Route path="/Guide" element={<Guide />} />
 
           {/* Protected Routes (เฉพาะผู้ที่ล็อกอินเท่านั้น) */}
           <Route element={<ProtectedRoute />}>
