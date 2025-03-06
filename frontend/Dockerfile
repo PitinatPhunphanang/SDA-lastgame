@@ -1,23 +1,28 @@
-FROM node:18  
+# ใช้ Node.js image เป็น base
+FROM node:18-alpine AS builder
 
-# Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
+# คัดลอก package.json และติดตั้ง dependencies
 COPY package*.json ./
-
 RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
 
-# Bundle app source
+# คัดลอกโค้ดทั้งหมดและ build
 COPY . .
+RUN npm run build
+
+# รันแอปใน production
+FROM node:18-alpine AS runner
+WORKDIR /app
 
 ENV NODE_ENV=production
-# Expose ports for backend and websocket
-EXPOSE 3000 
 
-# Start both Strapi and WebSocket
-CMD ["npm", "run", "start"]
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package*.json ./
+
+RUN npm install --production
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
