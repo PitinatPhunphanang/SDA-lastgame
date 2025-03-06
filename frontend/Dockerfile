@@ -19,4 +19,4 @@ ENV NODE_ENV=production
 # เปิด Port 3000 สำหรับ React
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]
