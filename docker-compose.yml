@@ -36,4 +36,4 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
     restart: always
     networks:
-      - tick
+      - app_network
