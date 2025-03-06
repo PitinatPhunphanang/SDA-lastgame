@@ -10,13 +10,10 @@ RUN npm install
 # Copy โค้ดทั้งหมดเข้าไปใน Container
 COPY . .
 
-# ✅ Build React เป็น Production
-RUN npm run build
-
 # ✅ ตั้งค่าให้ใช้งาน Production Mode
 ENV NODE_ENV=production
 
 # เปิด Port 3000 สำหรับ React
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
