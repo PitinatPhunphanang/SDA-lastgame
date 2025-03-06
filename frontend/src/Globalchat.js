@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import axios from 'axios'; // นำเข้า axios
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import conf from './conf/main';
@@ -9,22 +9,21 @@ function GlobalChat() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [socket, setSocket] = useState(null);
-  const [username, setUsername] = useState(''); // State สำหรับเก็บชื่อผู้ใช้
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
 
   const handleGoHome = () => navigate('/');
 
-  // ดึงข้อมูลผู้ใช้จาก Strapi API
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = sessionStorage.getItem('authToken'); // รับ JWT token จาก localStorage
+        const token = sessionStorage.getItem('authToken');
         const response = await axios.get(`${conf.apiUrlPrefix}/users/me`, {
           headers: {
-            Authorization: `Bearer ${token}`, // ส่ง token ไปกับ header
+            Authorization: `Bearer ${token}`,
           },
         });
-        setUsername(response.data.username); // ตั้งค่าชื่อผู้ใช้
+        setUsername(response.data.username);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -33,28 +32,32 @@ function GlobalChat() {
     fetchUser();
   }, []);
 
-  // เชื่อมต่อ Socket เมื่อ Component ถูกโหลด
   useEffect(() => {
-    const newSocket = io(`${conf.globalchat}:8080`);
+    if (!username) return;
+
+    const newSocket = io(`${conf.url}`);
     setSocket(newSocket);
 
     // ส่งชื่อผู้ใช้ไปยัง Server เมื่อเชื่อมต่อ
-    if (username) {
-      newSocket.emit('register', username);
-    }
+    newSocket.emit('register', username);
 
     // รับข้อความจาก Server
     newSocket.on('message', (message) => {
       setMessages((prev) => [...prev, message]);
     });
 
-    return () => newSocket.disconnect(); // ตัดการเชื่อมต่อเมื่อ Component Unmount
-  }, [username]); // เรียก useEffect ใหม่เมื่อ username เปลี่ยนแปลง
+    // รับข้อความระบบ (system messages) จาก Server
+    newSocket.on('systemMessage', (message) => {
+      setMessages((prev) => [...prev, { text: message, isSystem: true }]);
+    });
+
+    return () => newSocket.disconnect();
+  }, [username]);
 
   const handleSendMessage = () => {
     if (inputMessage.trim() && socket) {
-      socket.emit('message', inputMessage); // ส่งข้อความไปยัง Server
-      setInputMessage(''); // ล้างช่องพิมพ์ข้อความ
+      socket.emit('message', inputMessage);
+      setInputMessage('');
     }
   };
 
@@ -83,7 +86,13 @@ function GlobalChat() {
         >
           {messages.map((message, index) => (
             <div key={index} className="mb-2">
-              {message}
+              {message.isSystem ? (
+                <em className="text-muted">{message.text}</em> // ข้อความระบบ
+              ) : (
+                <div>
+                  <strong>{message.username}:</strong> {message.text}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -105,8 +114,8 @@ function GlobalChat() {
 
         {/* ลิงค์ไปหน้าหลัก */}
         <div className="position-absolute" style={{ bottom: '20px', left: '20px', fontSize: '2.5rem', color: 'white', cursor: 'pointer' }} onClick={handleGoHome}>
-        <i className="bi bi-house"></i> 
-      </div>
+          <i className="bi bi-house"></i>
+        </div>
       </div>
     </div>
   );
