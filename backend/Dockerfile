@@ -1,22 +1,18 @@
-FROM node:18  
+FROM node:18-alpine3.18
+RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev nasm bash vips-dev git
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 
-# Create app directory
-WORKDIR /usr/src/app
+WORKDIR /opt/
+COPY package.json package-lock.json ./
+RUN npm install -g node-gyp
+RUN npm config set fetch-retry-maxtimeout 600000 -g && npm install
+ENV PATH=/opt/node_modules/.bin:$PATH
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
-
-RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
-
-# Bundle app source
+WORKDIR /opt/app
 COPY . .
-
-# Expose ports for backend and websocket
-EXPOSE 8000 8080 3001 
-
-# Start both Strapi and WebSocket
-CMD ["sh", "-c", "npm run dev & cd src && node ."]
+RUN chown -R node:node /opt/app
+USER node
+RUN ["npm", "run", "build"]
+EXPOSE 1337
+CMD ["npm", "run", "start"]

@@ -37,3 +37,6 @@ services:
     restart: always
     networks:
       - app_network
+
+networks:
+    app_network:   
