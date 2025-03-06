@@ -15,6 +15,7 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+ENV NODE_ENV=production
 # Expose ports for backend and websocket
 EXPOSE 3000 
 
