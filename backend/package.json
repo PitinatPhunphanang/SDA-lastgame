@@ -10,7 +10,7 @@
     "start": "strapi start",
     "strapi": "strapi",
     "start:websocket": "node src/websocket.js",
-    "dev": "concurrently \"strapi develop\" \"node src/websocket.js\""
+    "dev": "concurrently \"strapi develop\" \"node src/index.js\""
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.10.4",

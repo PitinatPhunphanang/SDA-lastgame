@@ -1,4 +1,3 @@
-const conf = require('./main');
 const http = require('http').createServer();
 const io = require('socket.io')(http, {
   cors: { origin: '*' }, // อนุญาตให้ทุก origin เชื่อมต่อ

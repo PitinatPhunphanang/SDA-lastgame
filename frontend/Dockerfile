@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 # Expose ports for backend and websocket
-EXPOSE 8000 8080 3001 
+EXPOSE 3000 
 
 # Start both Strapi and WebSocket
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
