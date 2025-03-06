@@ -1,7 +1,6 @@
 FROM node:18-alpine3.18
 RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev nasm bash vips-dev git
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+ENV NODE_ENV=production
 
 WORKDIR /opt/
 COPY package.json package-lock.json ./
@@ -16,4 +15,5 @@ USER node
 RUN ["npm", "run", "build"]
 EXPOSE 1337
 EXPOSE 8080
-CMD ["npm", "run", "start"]
+ENTRYPOINT ["npm", "run", "start"]
+CMD ["node", "./backend/src/index.js"]

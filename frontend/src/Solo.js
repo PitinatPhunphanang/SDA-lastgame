@@ -199,7 +199,7 @@ function SinglePlayerGame() {
       const response = await axios.get(`${conf.apiUrlPrefix}/games?populate=*`);
       const questionData = response.data.data[index];
       if (questionData && questionData.img) {
-        const imageUrl = `${conf.apiUrlPrefix}${questionData.img.url}`;
+        const imageUrl = `${conf.url}${questionData.img.url}`;
         setTotalQuestions(response.data.data.length);
         console.log("total", totalQuestions);
         console.log("current", currentQuestionIndex);
