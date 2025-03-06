@@ -1,28 +1,22 @@
-# ใช้ Node.js image เป็น base
-FROM node:18-alpine AS builder
+FROM node:18  
 
-WORKDIR /app
+# Create app directory
+WORKDIR /usr/src/app
 
-# คัดลอก package.json และติดตั้ง dependencies
+# Copy package.json และติดตั้ง dependencies
 COPY package*.json ./
 RUN npm install
 
-# คัดลอกโค้ดทั้งหมดและ build
+# Copy โค้ดทั้งหมดเข้าไปใน Container
 COPY . .
+
+# ✅ Build React เป็น Production
 RUN npm run build
 
-# รันแอปใน production
-FROM node:18-alpine AS runner
-WORKDIR /app
-
+# ✅ ตั้งค่าให้ใช้งาน Production Mode
 ENV NODE_ENV=production
 
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
-
-RUN npm install --production
-
+# เปิด Port 3000 สำหรับ React
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
