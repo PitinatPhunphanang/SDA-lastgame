@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 8000 8080 3001 
 
 # Start both Strapi and WebSocket
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "npm run dev & cd src && node ."]
